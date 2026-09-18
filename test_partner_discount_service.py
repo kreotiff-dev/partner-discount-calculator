@@ -59,6 +59,7 @@ class PartnerDiscountServiceTests(unittest.TestCase):
         normalized_query = PARTNER_TOTAL_QUANTITY_QUERY.lower()
 
         self.assertIn("sum(di.quantity)", normalized_query)
+        self.assertIn("coalesce(sum(di.quantity), 0)", normalized_query)
         self.assertIn("left join deliveries", normalized_query)
         self.assertIn("left join delivery_items", normalized_query)
 
@@ -73,3 +74,11 @@ class PartnerDiscountServiceTests(unittest.TestCase):
         self.assertEqual(partners[0]["rating"], 4.8)
         self.assertEqual(partners[0]["total_quantity"], 10_000)
         self.assertEqual(partners[0]["discount_percent"], 5)
+
+    def test_returns_zero_discount_for_partner_without_deliveries(self) -> None:
+        database_connection = FakeConnection((8, "ООО Без отгрузок", 0))
+
+        partner = get_partner_with_discount(8, database_connection)
+
+        self.assertEqual(partner["total_quantity"], 0)
+        self.assertEqual(partner["discount_percent"], 0)
