@@ -5,11 +5,11 @@ from tkinter import ttk
 from partner_discount_service import get_all_partners_with_discounts
 
 
-BACKGROUND_COLOR = "#f4f4f4"
+BACKGROUND_COLOR = "#ffffff"
 CARD_COLOR = "#ffffff"
-BORDER_COLOR = "#8a8a8a"
+BORDER_COLOR = "#909090"
 TEXT_COLOR = "#1f1f1f"
-ACCENT_COLOR = "#2d6ca2"
+BUTTON_COLOR = "#f5f5f5"
 
 
 class PartnerListApplication(tk.Tk):
@@ -59,13 +59,14 @@ class PartnerListApplication(tk.Tk):
             text="Обновить",
             command=self.load_partners,
             font=("Arial", 10),
-            foreground=CARD_COLOR,
-            background=ACCENT_COLOR,
-            activebackground="#24567f",
-            activeforeground=CARD_COLOR,
-            borderwidth=0,
-            padx=16,
-            pady=8,
+            foreground=TEXT_COLOR,
+            background=BUTTON_COLOR,
+            activebackground="#e8e8e8",
+            activeforeground=TEXT_COLOR,
+            borderwidth=1,
+            relief="solid",
+            padx=14,
+            pady=6,
         )
         refresh_button.pack(side="right")
 
@@ -80,7 +81,6 @@ class PartnerListApplication(tk.Tk):
         self.canvas.configure(yscrollcommand=scrollbar.set)
         self.canvas.bind("<Configure>", self.resize_cards_frame)
         self.cards_frame.grid_columnconfigure(0, weight=1)
-        self.cards_frame.grid_columnconfigure(1, weight=1)
         self.canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
 
@@ -102,7 +102,7 @@ class PartnerListApplication(tk.Tk):
             self.show_message("Партнёры не найдены.")
             return
         for index, partner in enumerate(partners):
-            self.create_partner_card(partner, index // 2, index % 2)
+            self.create_partner_card(partner, index)
 
     def show_message(self, message: str) -> None:
         message_label = tk.Label(
@@ -112,9 +112,9 @@ class PartnerListApplication(tk.Tk):
             foreground=TEXT_COLOR,
             background=BACKGROUND_COLOR,
         )
-        message_label.grid(row=0, column=0, columnspan=2, pady=30)
+        message_label.grid(row=0, column=0, pady=30)
 
-    def create_partner_card(self, partner: dict[str, object], row: int, column: int) -> None:
+    def create_partner_card(self, partner: dict[str, object], row: int) -> None:
         card = tk.Frame(
             self.cards_frame,
             background=CARD_COLOR,
@@ -123,13 +123,13 @@ class PartnerListApplication(tk.Tk):
             padx=24,
             pady=16,
         )
-        card.grid(row=row, column=column, sticky="nsew", padx=8, pady=8)
+        card.grid(row=row, column=0, sticky="ew", padx=20, pady=8)
         information = tk.Frame(card, background=CARD_COLOR)
         information.pack(side="left", fill="x", expand=True)
         name_label = tk.Label(
             information,
             text=f"Партнёр | {partner['partner_name']}",
-            font=("Arial", 13),
+            font=("Arial", 12),
             foreground=TEXT_COLOR,
             background=CARD_COLOR,
         )
@@ -170,7 +170,7 @@ class PartnerListApplication(tk.Tk):
         discount_label = tk.Label(
             card,
             text=f"{partner['discount_percent']}%",
-            font=("Arial", 16),
+            font=("Arial", 12),
             foreground=TEXT_COLOR,
             background=CARD_COLOR,
         )
