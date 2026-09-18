@@ -1,6 +1,7 @@
 import unittest
 
 from partner_discount_service import PARTNER_TOTAL_QUANTITY_QUERY
+from partner_discount_service import get_all_partners_with_discounts
 from partner_discount_service import get_partner_with_discount
 
 
@@ -16,12 +17,15 @@ class FakeCursor:
     def __exit__(self, exc_type: object, exc_value: object, traceback: object) -> None:
         return None
 
-    def execute(self, query: str, parameters: tuple[int]) -> None:
+    def execute(self, query: str, parameters: tuple[int] | None = None) -> None:
         self.query = query
         self.parameters = parameters
 
     def fetchone(self) -> tuple[int, str, int] | None:
         return self.row
+
+    def fetchall(self) -> list[tuple[object, ...]]:
+        return self.row if isinstance(self.row, list) else []
 
 
 class FakeConnection:
@@ -57,3 +61,14 @@ class PartnerDiscountServiceTests(unittest.TestCase):
         self.assertIn("sum(di.quantity)", normalized_query)
         self.assertIn("left join deliveries", normalized_query)
         self.assertIn("left join delivery_items", normalized_query)
+
+    def test_returns_all_partners_with_discounts(self) -> None:
+        database_connection = FakeConnection(
+            [(1, "ООО Тест", "test@example.ru", "+79990000000", 10_000)]
+        )
+
+        partners = get_all_partners_with_discounts(database_connection)
+
+        self.assertEqual(partners[0]["partner_id"], 1)
+        self.assertEqual(partners[0]["total_quantity"], 10_000)
+        self.assertEqual(partners[0]["discount_percent"], 5)
