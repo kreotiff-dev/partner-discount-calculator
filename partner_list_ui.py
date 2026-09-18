@@ -76,13 +76,19 @@ class PartnerListApplication(tk.Tk):
         scrollbar = ttk.Scrollbar(container, orient="vertical", command=self.canvas.yview)
         self.cards_frame = tk.Frame(self.canvas, background=BACKGROUND_COLOR)
         self.cards_frame.bind("<Configure>", self.update_scroll_region)
-        self.canvas.create_window((0, 0), window=self.cards_frame, anchor="nw")
+        self.cards_window = self.canvas.create_window((0, 0), window=self.cards_frame, anchor="nw")
         self.canvas.configure(yscrollcommand=scrollbar.set)
+        self.canvas.bind("<Configure>", self.resize_cards_frame)
+        self.cards_frame.grid_columnconfigure(0, weight=1)
+        self.cards_frame.grid_columnconfigure(1, weight=1)
         self.canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
 
     def update_scroll_region(self, event: tk.Event) -> None:
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+    def resize_cards_frame(self, event: tk.Event) -> None:
+        self.canvas.itemconfigure(self.cards_window, width=event.width)
 
     def load_partners(self) -> None:
         for widget in self.cards_frame.winfo_children():
@@ -95,8 +101,8 @@ class PartnerListApplication(tk.Tk):
         if not partners:
             self.show_message("Партнёры не найдены.")
             return
-        for partner in partners:
-            self.create_partner_card(partner)
+        for index, partner in enumerate(partners):
+            self.create_partner_card(partner, index // 2, index % 2)
 
     def show_message(self, message: str) -> None:
         message_label = tk.Label(
@@ -106,9 +112,9 @@ class PartnerListApplication(tk.Tk):
             foreground=TEXT_COLOR,
             background=BACKGROUND_COLOR,
         )
-        message_label.pack(pady=30)
+        message_label.grid(row=0, column=0, columnspan=2, pady=30)
 
-    def create_partner_card(self, partner: dict[str, object]) -> None:
+    def create_partner_card(self, partner: dict[str, object], row: int, column: int) -> None:
         card = tk.Frame(
             self.cards_frame,
             background=CARD_COLOR,
@@ -117,7 +123,7 @@ class PartnerListApplication(tk.Tk):
             padx=24,
             pady=16,
         )
-        card.pack(fill="x", padx=1, pady=8)
+        card.grid(row=row, column=column, sticky="nsew", padx=8, pady=8)
         information = tk.Frame(card, background=CARD_COLOR)
         information.pack(side="left", fill="x", expand=True)
         name_label = tk.Label(
@@ -144,6 +150,15 @@ class PartnerListApplication(tk.Tk):
             background=CARD_COLOR,
         )
         phone_label.pack(anchor="w")
+        rating_value = "не указан" if partner["rating"] is None else f"{partner['rating']:g}"
+        rating_label = tk.Label(
+            information,
+            text=f"Рейтинг: {rating_value}",
+            font=("Arial", 10),
+            foreground=TEXT_COLOR,
+            background=CARD_COLOR,
+        )
+        rating_label.pack(anchor="w")
         quantity_label = tk.Label(
             information,
             text=f"Объём: {partner['total_quantity']} шт.",

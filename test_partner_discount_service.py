@@ -64,11 +64,12 @@ class PartnerDiscountServiceTests(unittest.TestCase):
 
     def test_returns_all_partners_with_discounts(self) -> None:
         database_connection = FakeConnection(
-            [(1, "ООО Тест", "test@example.ru", "+79990000000", 10_000)]
+            [(1, "ООО Тест", "test@example.ru", "+79990000000", 4.8, 10_000)]
         )
 
         partners = get_all_partners_with_discounts(database_connection)
 
         self.assertEqual(partners[0]["partner_id"], 1)
+        self.assertEqual(partners[0]["rating"], 4.8)
         self.assertEqual(partners[0]["total_quantity"], 10_000)
         self.assertEqual(partners[0]["discount_percent"], 5)

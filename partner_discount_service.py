@@ -24,11 +24,12 @@ select
     p.partner_name,
     p.email,
     p.phone,
+    p.rating,
     coalesce(sum(di.quantity), 0) as total_quantity
 from partners p
 left join deliveries d on d.partner_id = p.partner_id
 left join delivery_items di on di.delivery_id = d.delivery_id
-group by p.partner_id, p.partner_name, p.email, p.phone
+group by p.partner_id, p.partner_name, p.email, p.phone, p.rating
 order by p.partner_name;
 """
 
@@ -75,8 +76,9 @@ def get_all_partners_with_discounts(
             "partner_name": row[1],
             "email": row[2],
             "phone": row[3],
-            "total_quantity": int(row[4]),
-            "discount_percent": calculate_partner_discount(int(row[4])),
+            "rating": row[4],
+            "total_quantity": int(row[5]),
+            "discount_percent": calculate_partner_discount(int(row[5])),
         }
         for row in rows
     ]
