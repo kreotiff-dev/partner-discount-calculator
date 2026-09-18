@@ -137,7 +137,7 @@ class PartnerListApplication(tk.Tk):
         name_label.pack(anchor="w")
         director_label = tk.Label(
             information,
-            text="Директор: не указан",
+            text="Директор",
             font=("Arial", 10),
             foreground=TEXT_COLOR,
             background=CARD_COLOR,
