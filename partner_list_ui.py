@@ -126,22 +126,23 @@ class PartnerListApplication(tk.Tk):
         card.grid(row=row, column=0, sticky="ew", padx=20, pady=8)
         information = tk.Frame(card, background=CARD_COLOR)
         information.pack(side="left", fill="x", expand=True)
+        partner_title = self.format_partner_title(str(partner["partner_name"]))
         name_label = tk.Label(
             information,
-            text=f"Партнёр | {partner['partner_name']}",
+            text=partner_title,
             font=("Arial", 12),
             foreground=TEXT_COLOR,
             background=CARD_COLOR,
         )
         name_label.pack(anchor="w")
-        email_label = tk.Label(
+        director_label = tk.Label(
             information,
-            text=f"Email: {partner['email']}",
+            text="Директор: не указан",
             font=("Arial", 10),
             foreground=TEXT_COLOR,
             background=CARD_COLOR,
         )
-        email_label.pack(anchor="w", pady=(4, 0))
+        director_label.pack(anchor="w", pady=(4, 0))
         phone_label = tk.Label(
             information,
             text=f"Телефон: {partner['phone']}",
@@ -159,14 +160,6 @@ class PartnerListApplication(tk.Tk):
             background=CARD_COLOR,
         )
         rating_label.pack(anchor="w")
-        quantity_label = tk.Label(
-            information,
-            text=f"Объём: {partner['total_quantity']} шт.",
-            font=("Arial", 10),
-            foreground=TEXT_COLOR,
-            background=CARD_COLOR,
-        )
-        quantity_label.pack(anchor="w")
         discount_label = tk.Label(
             card,
             text=f"{partner['discount_percent']}%",
@@ -175,6 +168,13 @@ class PartnerListApplication(tk.Tk):
             background=CARD_COLOR,
         )
         discount_label.pack(side="right", padx=10)
+
+    @staticmethod
+    def format_partner_title(partner_name: str) -> str:
+        name_parts = partner_name.split(" ", 1)
+        if len(name_parts) == 1:
+            return f"Партнёр | {partner_name}"
+        return f"{name_parts[0]} | {name_parts[1]}"
 
 
 if __name__ == "__main__":
